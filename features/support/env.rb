@@ -1,0 +1,6 @@
+require 'watir-webdriver'
+require 'cucumber'
+require 'minitest'
+require 'headless'
+require 'navegador.rb'
+require 'amazon.rb'
