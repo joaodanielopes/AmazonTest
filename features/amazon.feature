@@ -5,7 +5,7 @@ Feature: Testes ao site da Amazon.co.uk
     And Navego para o site https://www.amazon.co.uk/
 
 
-  Scenario: Criar conta nova com user existente
+  Scenario: Criar uma conta nova para um utilizador já existente
     When Crio uma conta nova com a seguinte informação
       | nome          | email                               | password        |
       | testGoContact | teste.1.teste.2.teste.123@gmail.com | test_go_contact |
@@ -18,7 +18,7 @@ Feature: Testes ao site da Amazon.co.uk
       | email                               | password               |
       | teste.1.teste.2.teste.123@gmail.com | test_go_contact_errada |
     Then Verifico que o login é realizado sem sucesso
-    And É apresentada a mensagem de erro "Your password is incorrect" no login
+    And É apresentada a mensagem de erro "Your password is incorrect"
     And Fecho o navegador
 
 
@@ -35,7 +35,7 @@ Feature: Testes ao site da Amazon.co.uk
       | email                               | password        |
       | teste.1.teste.2.teste.123@gmail.com | test_go_contact |
     When Faço uma pesquisa por "chasing Excellence"
-    Then Verifico que houve resultados
+    Then Verifico que há resultados
     And Filtro por "Bergeron"
     And Seleciono o primeiro resultado obtido
     When Pesquiso por comentários do utilizador "Cerith Leighton Watkins"
@@ -47,14 +47,14 @@ Feature: Testes ao site da Amazon.co.uk
 
   Scenario: Pesquisar filme
     When Faço uma pesquisa por "avengers"
-    Then Verifico que houve resultados
+    Then Verifico que há resultados
     And Seleciono "Avengers Assemble"
     And Verifico que a descrição contém o texto "S.H.I.E.L.D"
     And Faço uma captura de "10" segundos do trailer
     And Fecho o navegador
 
 
-  Scenario: Shop by Department
+  Scenario: "Shop by Department"
     When Escolho no departamento "Sports & Outdoors" a área "Fitness"
     Then Verifico que existe a marca "Adidas"
     And Tiro uma captura de ecrã

@@ -1,90 +1,90 @@
 # encoding: utf-8
 When(/^Crio uma conta nova com a seguinte informação$/) do |table|
-  dados       = table.hashes.first
-  @nova_conta = Amazon::NovaConta.new
-  @nova_conta.criar(dados)
+  info         = table.hashes.first
+  @new_account ||= Amazon::NewAccount.new($browser)
+  @new_account.create_account(info)
 end
 
-Then(/^Verifico que a conta é criada (com|sem) sucesso$/) do |sucesso|
-  case (sucesso)
+Then(/^Verifico que a conta é criada (com|sem) sucesso$/) do |op|
+  case (op)
     when 'com'
-      assert(!@nova_conta.campos_errados?, "Site não permite criação da conta.")
+      assert(!@new_account.has_wrong_fields?, "Site não permite criação da conta.")
     when 'sem'
-      assert(@nova_conta.campos_errados?, "Site permite criação da conta.")
+      assert(@new_account.has_wrong_fields?, "Site permite criação da conta.")
   end
 end
 
 When(/^Faço login com a seguinte informação$/) do |table|
-  dados  = table.hashes.first
-  @login = Amazon::Login.new
-  @login.login(dados)
+  info   = table.hashes.first
+  @login ||= Amazon::Login.new($browser)
+  @login.login(info)
 end
 
-Then(/^Verifico que o login é realizado (com|sem) sucesso$/) do |sucesso|
-  case (sucesso)
+Then(/^Verifico que o login é realizado (com|sem) sucesso$/) do |op|
+  case (op)
     when 'com'
-      assert(!@login.sucesso?, "Login realizado sem sucesso")
+      assert(!@login.has_sucess?, "Login realizado sem sucesso")
     when 'sem'
-      assert(@login.sucesso?, "Login realizado com sucesso.")
+      assert(@login.has_sucess?, "Login realizado com sucesso.")
   end
 end
 
-And(/^É apresentada a mensagem de erro "([^"]*)" no login$/) do |sucesso|
-  assert(@login.apresenta_mensagem?(sucesso), "Mensagem não apresentada.")
+And(/^É apresentada a mensagem de erro "([^"]*)"$/) do |msg|
+  assert(@login.alert_presented?(msg), "Mensagem '#{msg}' não apresentada.")
 end
 
-When(/^Faço uma pesquisa por "([^"]*)"$/) do |texto|
-  @pesquisa = Amazon::Pesquisa.new
-  @pesquisa.pesquisa(texto)
+When(/^Faço uma pesquisa por "([^"]*)"$/) do |text|
+  @search ||= Amazon::Search.new($browser)
+  @search.search(text)
 end
 
-Then(/^Verifico que houve resultados$/) do
-  assert(@pesquisa.existem_resultados?, "A pesquisa não obteve nenhum resultado.")
+Then(/^Verifico que há resultados$/) do
+  assert(@search.has_results?, "A pesquisa não obteve nenhum resultado.")
 end
 
-And(/^Filtro por "([^"]*)"$/) do |autor|
-  assert(@pesquisa.filtrar(autor), "Filtro '#{autor}' não encontrado.")
+And(/^Filtro por "([^"]*)"$/) do |aut|
+  assert(@search.filter(aut), "Filtro '#{aut}' não encontrado.")
 end
 
 And(/^Seleciono o primeiro resultado obtido$/) do
-  @pesquisa.selecionar_resultado
-  @produto = Amazon::Produto.new
+  @search.select_first_result
+  @produto ||= Amazon::Produto.new($browser)
 end
 
-And(/^Pesquiso por comentários do utilizador "([^"]*)"$/) do |utilizador|
-  @produto.pesquiso_comentario_do_utilizador(utilizador)
+And(/^Pesquiso por comentários do utilizador "([^"]*)"$/) do |user|
+  @produto.search_review_by_user(user)
 end
 
 And(/^Insiro o comentário "([^"]*)"$/) do |comment|
-  @produto.inserir_comentario(comment)
+  @produto.insert_comment_to_review(comment)
 end
 
-And(/^Pesquiso por comentários de "([^"]*)" estrela$/) do |estrelas|
-  @produto.pesquiso_comentarios_por_estrela(estrelas)
+And(/^Pesquiso por comentários de "([^"]*)" estrela$/) do |stars|
+  @produto.filter_reviews_by_stars(stars)
 end
 
 And(/^Valido que existe comentário com a data "([^"]*)"/) do |data|
-  assert(@produto.pesquiso_comentario_por_data(data), "Nenhum comentário encontrado para a data '#{data}'")
+  assert(@produto.search_review_by_date(data), "Nenhum comentário encontrado para a data '#{data}'")
 end
 
-And(/^Seleciono "([^"]*)"/) do |titulo|
-  @produto ||= Amazon::Produto.new
-  assert(@produto.clicar_em_titulo(titulo), "Filme #{titulo} não encontrado")
+And(/^Seleciono "([^"]*)"/) do |text|
+  @search.select(text)
+  @produto ||= Amazon::Produto.new($browser)
 end
 
-And(/^Verifico que a descrição contém o texto "([^"]*)"/) do |texto|
-  assert(@produto.descricao_contem_texto?(texto), "'#{texto}' não está presente na descrição do filme.")
+And(/^Verifico que a descrição contém o texto "([^"]*)"/) do |text|
+  assert(@produto.description_include?(text), "'#{text}' não está presente na descrição do produto.")
 end
 
-And(/^Faço uma captura de "([^"]*)" segundos do trailer/) do |duracao|
-  @produto.capturar_trailer(duracao)
+And(/^Faço uma captura de "([^"]*)" segundos do trailer/) do |dur|
+  @produto.capture_trailer(dur)
 end
 
-When(/^Escolho no departamento "([^"]*)" a área "([^"]*)"$/) do |departamento, area|
-  @shop = Amazon::ShopByDepartment.new
-  @shop.selecionar(departamento, area)
+When(/^Escolho no departamento "([^"]*)" a área "([^"]*)"$/) do |dep, area|
+  @shop ||= Amazon::ShopByDepartment.new($browser)
+  @shop.select_dep_and_area(dep, area)
 end
 
 Then(/^Verifico que existe a marca "([^"]*)"$/) do |marca|
-  assert(@shop.marca_existe?(marca), "A marca '#{marca}' não foi encontrada.")
+  assert(@shop.brand_exists?(marca), "A marca '#{marca}' não foi encontrada.")
 end
